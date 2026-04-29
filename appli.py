@@ -8,11 +8,11 @@ import os
 app = Flask(__name__)
 app.secret_key = "cambuy_secret_key"
 
-
+init_db()
 # Création base de données
 def init_db():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "database.db")
+    
+    db_path = "/tmp/database.db"
     conn = sqlite3.connect(db_path)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS responses (
@@ -47,9 +47,8 @@ def submit():
         request.form['raison'],
         request.form['produit']
     )
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "database.db")
+    
+    db_path = "/tmp/database.db"
     conn = sqlite3.connect(db_path)
     conn.execute('''
         INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
