@@ -8,10 +8,9 @@ import os
 app = Flask(__name__)
 app.secret_key = "cambuy_secret_key"
 
-init_db()
 # Création base de données
 def init_db():
-    
+    init_db()    
     db_path = "/tmp/database.db"
     conn = sqlite3.connect(db_path)
     conn.execute('''
