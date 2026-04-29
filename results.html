@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Analyse Descriptive</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        h1 { text-align: center; }
+    </style>
+</head>
+
+<body>
+
+<h1>📊 Dashboard Analyse Descriptive</h1>
+
+<div style="text-align: right; margin-bottom: 10px;">
+    <a href="/logout" style="
+        background: red;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+    ">
+        Se déconnecter
+    </a>
+</div>
+
+<div class="card">
+    <h3>📌 Statistiques générales</h3>
+    <p>Total réponses : {{ total }}</p>
+    <p>Âge moyen : {{ moyenne_age }}</p>
+</div>
+
+<div class="card">
+    <h3>👥 Répartition par sexe</h3>
+    <canvas id="sexeChart"></canvas>
+</div>
+
+<div class="card">
+    <h3>🛍️ Préférences d'achat</h3>
+    <canvas id="prefChart"></canvas>
+</div>
+
+<div class="card">
+    <h3>📦 Produits achetés</h3>
+    <canvas id="prodChart"></canvas>
+</div>
+
+<script>
+/* SEXE */
+new Chart(document.getElementById('sexeChart'), {
+    type: 'pie',
+    data: {
+        labels: {{ sexe_labels | tojson }},
+        datasets: [{
+            data: {{ sexe_values | tojson }}
+        }]
+    }
+});
+
+/* PREFERENCE */
+new Chart(document.getElementById('prefChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ pref_labels | tojson }},
+        datasets: [{
+            data: {{ pref_values | tojson }}
+        }]
+    }
+});
+
+/* PRODUITS */
+new Chart(document.getElementById('prodChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ prod_labels | tojson }},
+        datasets: [{
+            data: {{ prod_values | tojson }}
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
