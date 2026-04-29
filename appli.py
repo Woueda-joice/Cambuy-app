@@ -11,7 +11,9 @@ app.secret_key = "cambuy_secret_key"
 
 # Création base de données
 def init_db():
-    conn = sqlite3.connect('database.db')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "database.db")
+    conn = sqlite3.connect(db_path)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS responses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +48,9 @@ def submit():
         request.form['produit']
     )
 
-    conn = sqlite3.connect('database.db')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "database.db")
+    conn = sqlite3.connect(db_path)
     conn.execute('''
         INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -64,12 +68,12 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # 🔐 identifiants pour toi + prof
+        # 🔐 identifiants pour le prof
         if username == "prof" and password == "cambuy2026":
             session['logged_in'] = True
             return redirect('/results')
         else:
-            return "❌ Identifiants incorrects"
+           return "❌ Identifiants incorrects"
 
     return render_template('login.html')
 
@@ -84,8 +88,11 @@ def logout():
 def results():
     if not session.get('logged_in'):
         return redirect('/login')
-
-    conn = sqlite3.connect('database.db')
+ 
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "database.db")
+    conn = sqlite3.connect(db_path)
+    
     df = pd.read_sql_query("SELECT * FROM responses", conn)
     conn.close()
 
@@ -124,9 +131,6 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
     
-
-if __name__ == '__main__':
-    app.run()
     
     
     
