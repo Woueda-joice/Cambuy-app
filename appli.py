@@ -53,37 +53,36 @@ def home():
 @app.route('/form')
 def form():
     return render_template('form.html')
-
+    
 @app.route('/submit', methods=['POST'])
 def submit():
-     try:
-         data = (
-             request.form.get('age'),
-             request.form.get('sexe'),
-             request.form.get('ville'),
-             request.form.get('frequence'),
-             request.form.get('preference'),
-             request.form.get('raison'),
-             request.form.get('produit')
-         )
-    
-          conn = get_db_connection()
-          cur = conn.cursor()
-    
-          cur.execute('''
-              INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
-              VALUES (%s, %s, %s, %s, %s, %s, %s)
-          ''', data)
-    
-          conn.commit()
-          cur.close()
-          conn.close()
+    try:
+        data = (
+            request.form.get('age'),
+            request.form.get('sexe'),
+            request.form.get('ville'),
+            request.form.get('frequence'),
+            request.form.get('preference'),
+            request.form.get('raison'),
+            request.form.get('produit')
+        )
 
-           return redirect('/results')
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-     except Exception as e:
-           return f"ERREUR SQL: {e}"
+        cur.execute('''
+            INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ''', data)
 
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect('/results')
+
+    except Exception as e:
+        return f"ERREUR SQL: {e}"
 
 
 @app.route('/login', methods=['GET', 'POST'])
