@@ -1,21 +1,25 @@
 from flask import Flask, render_template, request, redirect, session
 from analysis import analyse_data, generate_charts
-import sqlite3
+import psycopg2
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
 app = Flask(__name__)
 app.secret_key = "cambuy_secret_key"
+def get_db_connection():
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    return
+psycopg2.connect(DATABASE_URL)
 
 # Création base de données
 def init_db():
     init_db()    
-    db_path = "/tmp/database.db"
-    conn = sqlite3.connect(db_path)
-    conn.execute('''
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS responses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             age INTEGER,
             sexe TEXT,
             ville TEXT,
@@ -25,6 +29,8 @@ def init_db():
             produit TEXT
         )
     ''')
+    conn.commit()
+    cur.close()
     conn.close()
 
 @app.route('/')
@@ -38,22 +44,23 @@ def form():
 @app.route('/submit', methods=['POST'])
 def submit():
     data = (
-        request.form['age'],
-        request.form['sexe'],
-        request.form['ville'],
-        request.form['frequence'],
-        request.form['preference'],
-        request.form['raison'],
-        request.form['produit']
+        request.form.get('age'),
+        request.form.get('sexe'),
+        request.form.get('ville'),
+        request.form.get('frequence'),
+        request.form.get('preference'),
+        request.form.get('raison'),
+        request.form.get('produit')
     )
     
-    db_path = "/tmp/database.db"
-    conn = sqlite3.connect(db_path)
-    conn.execute('''
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
         INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     ''', data)
     conn.commit()
+    cur.close()
     conn.close()
 
     return redirect('/results')
@@ -87,10 +94,7 @@ def results():
     if not session.get('logged_in'):
         return redirect('/login')
  
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "database.db")
-    conn = sqlite3.connect(db_path)
-    
+    conn = get_db_connection()
     df = pd.read_sql_query("SELECT * FROM responses", conn)
     conn.close()
 
