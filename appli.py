@@ -7,6 +7,8 @@ import os
 
 app = Flask(__name__)
 app.secret_key = "cambuy_secret_key"
+init_db()
+
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -17,7 +19,8 @@ def get_db_connection():
     return conn
 
 # Création base de données
-def init_db():  
+def init_db(): 
+    print("Initialisation DB")
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
@@ -35,6 +38,7 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
+    print("DB prete")
 
 @app.route('/')
 def home():
@@ -46,7 +50,8 @@ def form():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    data = (
+    try:
+      data = (
         request.form.get('age'),
         request.form.get('sexe'),
         request.form.get('ville'),
@@ -67,6 +72,9 @@ def submit():
     conn.close()
 
     return redirect('/results')
+
+except Exception as e:
+   return f"ERREUR SQL: {e}"
 
 
 
