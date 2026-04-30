@@ -11,7 +11,10 @@ init_db()
 
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL")
-
+    
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL non définie sur Render")
+        
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
@@ -23,6 +26,7 @@ def init_db():
     print("Initialisation DB")
     conn = get_db_connection()
     cur = conn.cursor()
+    
     cur.execute('''
         CREATE TABLE IF NOT EXISTS responses (
             id SERIAL PRIMARY KEY,
@@ -35,6 +39,8 @@ def init_db():
             produit TEXT
         )
     ''')
+
+    
     conn.commit()
     cur.close()
     conn.close()
@@ -50,31 +56,33 @@ def form():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    try:
-      data = (
-        request.form.get('age'),
-        request.form.get('sexe'),
-        request.form.get('ville'),
-        request.form.get('frequence'),
-        request.form.get('preference'),
-        request.form.get('raison'),
-        request.form.get('produit')
-    )
+     try:
+         data = (
+             request.form.get('age'),
+             request.form.get('sexe'),
+             request.form.get('ville'),
+             request.form.get('frequence'),
+             request.form.get('preference'),
+             request.form.get('raison'),
+             request.form.get('produit')
+         )
     
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
-    ''', data)
-    conn.commit()
-    cur.close()
-    conn.close()
+          conn = get_db_connection()
+          cur = conn.cursor()
+    
+          cur.execute('''
+              INSERT INTO responses (age, sexe, ville, frequence, preference, raison, produit)
+              VALUES (%s, %s, %s, %s, %s, %s, %s)
+          ''', data)
+    
+          conn.commit()
+          cur.close()
+          conn.close()
 
-    return redirect('/results')
+           return redirect('/results')
 
-except Exception as e:
-   return f"ERREUR SQL: {e}"
+     except Exception as e:
+           return f"ERREUR SQL: {e}"
 
 
 
