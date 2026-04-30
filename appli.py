@@ -7,7 +7,6 @@ import os
 
 app = Flask(__name__)
 app.secret_key = "cambuy_secret_key"
-init_db()
 
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -45,6 +44,8 @@ def init_db():
     cur.close()
     conn.close()
     print("DB prete")
+
+init_db()
 
 @app.route('/')
 def home():
