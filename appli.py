@@ -9,12 +9,15 @@ app = Flask(__name__)
 app.secret_key = "cambuy_secret_key"
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL")
-    return
-psycopg2.connect(DATABASE_URL)
+
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
 
 # Création base de données
-def init_db():
-    init_db()    
+def init_db():  
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
